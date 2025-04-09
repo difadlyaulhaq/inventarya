@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:inventarya/bloc/auth/auth_bloc.dart';
+import 'package:inventarya/bloc/auth/auth_event.dart';
+import 'package:inventarya/bloc/auth/auth_state.dart';
 import 'package:inventarya/widget/button_widget.dart';
 
 class LoginPage extends StatefulWidget {
@@ -50,8 +54,8 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 40),
                 TextField(
                   controller: _usernameController,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -75,25 +79,49 @@ class _LoginPageState extends State<LoginPage> {
                   obscureText: _obscureText,
                 ),
                 const SizedBox(height: 30),
-                CustomButton(
-                  text: "Login",
-                  onPressed: () {
-                    if (_usernameController.text.isEmpty ||
-                        _passwordController.text.isEmpty) {
+
+                // BlocConsumer untuk Login Button
+                BlocConsumer<AuthBloc, AuthState>(
+                  listener: (context, state) {
+                    if (state is Authenticated) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please fill in all fields'),
-                        ),
+                        const SnackBar(content: Text('Login successful!')),
                       );
-                    } else {
-                      // Implement your login logic here
+                      context.go('/home');
+                    } else if (state is AuthError) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Login successful!'),
-                        ),
+                        SnackBar(content: Text(state.message)),
                       );
-                      GoRouter.of(context).go('/home');
                     }
+                  },
+                  builder: (context, state) {
+                    return CustomButton(
+                      text: state is AuthLoading ? null : "Login",
+                      onPressed: state is AuthLoading
+                          ? null
+                          : () {
+                              if (_usernameController.text.isEmpty ||
+                                  _passwordController.text.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Please fill in all fields'),
+                                  ),
+                                );
+                              } else {
+                                context.read<AuthBloc>().add(
+                                      LoginRequested(
+                                        _usernameController.text.trim(),
+                                        _passwordController.text.trim(),
+                                      ),
+                                    );
+                              }
+                            },
+                      child: state is AuthLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : null,
+                    );
                   },
                 ),
               ],
