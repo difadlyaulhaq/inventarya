@@ -1,9 +1,9 @@
-class InventoryItem {
-  final String id;
-  final String name;
-  final String typeId;
-  final String typeName;
-  final int quantity;
+class InventoryItem {/// Model untuk item inventory yang akan digunakan dalam aplikasi.
+  final String id; // ID unik untuk item inventory.
+  final String name; // Nama item inventory.
+  final String typeId; // ID jenis item inventory.
+  final String typeName; // Nama jenis item inventory.
+  final int quantity; // Jumlah item inventory.
 
   InventoryItem({
     required this.id,
