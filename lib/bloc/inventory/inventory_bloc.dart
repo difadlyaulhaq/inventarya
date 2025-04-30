@@ -27,7 +27,7 @@ class InventoryBloc extends Bloc<InventoryEvent, InventoryState> {
     try {
       // Menambahkan item ke koleksi 'inventories' di Firestore.
       await firestore.collection('inventories').add(event.item.toMap());
-      emit(InventoryUploaded()); // Mengubah state menjadi `InventoryUploaded` (upload berhasil).
+      emit(InventoryUploaded()); // Mengubah state menjadi `InventoryUploaded` (upload berhasil). 
       add(FetchInventories()); // Memicu event `FetchInventories` untuk memperbarui daftar inventory.
     } catch (e) {
       emit(InventoryUploadError(e.toString())); // Mengubah state menjadi `InventoryUploadError` jika terjadi error.
